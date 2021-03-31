@@ -171,6 +171,7 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
             method: 'GET',
             url: self.config.base_index_url + (path || '') + (self.config.tail_slash? '/': '')
         }).then(function (response) {
+            var lastPath = window.localStorage.getItem('lastPath');
             var files = response.data || [];
 
             for (var i = 0, l = files.length; i < l; i++) {
@@ -182,6 +183,14 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
 
             window.localStorage.setItem('lastPath', path);
             window.scrollTo(0, 0);
+            if(lastPath && lastPath != path) {
+              setTimeout(function() {
+                  var current = lastPath.substring(lastPath.lastIndexOf('/') + 1);
+                  var lastDir = document.querySelector('a[href$="' + current + '"]');
+                  if(lastDir) { lastDir.scrollIntoView({block: "center"}); }
+              }, 0);
+            }
+
         }, function (response) {
             self.error = response;
             self.loading.stop();
